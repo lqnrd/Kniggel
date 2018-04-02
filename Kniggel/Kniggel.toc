@@ -1,0 +1,11 @@
+## Interface: 60200
+## Author: lqnrd
+## Title: Kniggel
+## Version: 0.17
+## SavedVariablesPerCharacter: KniggelOptions
+## Notes: Kniggel
+
+Libs\LibStub.lua
+Libs\iTransferProtocol-1.0.lua
+
+Kniggel.lua
