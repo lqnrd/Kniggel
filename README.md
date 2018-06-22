@@ -16,7 +16,7 @@ Player Alice from realm Azeroth wants to play with Bob and Eve, so Alice opens t
 the presses return to save the list.
 
 Command options
-Use `/kniggel <option>` to access these options:
+Use `/kniggel ‹option›` to access these options:
 
 *  show/hide: show or hide the window
 *  resetposition: reset the window's position

@@ -1431,6 +1431,8 @@ local function initFrame()
     sendBroadcastAllPlayersFirstTurn = "ALL";
     sendBroadcastPlayerWins = "END";
     sendBroadcastGameBackup = "BKP";
+    reqVersionNumber = "VER";
+    sendVersionNumber = "VRR";
   };
   
   frame.getNewGameId = function(self)
@@ -1532,6 +1534,13 @@ local function initFrame()
     --msg = msg..table.concat({...}, " ")
     --msgcontent = "Playername-Realmname1118722038 8 Playername-Realmname 123 ..."
     --msgid = iTP:SendAddonMessage(self.COMprefix, msg, self.COMchannel)
+    
+    --iTP:SendAddonMessage(self.COMprefix, "BKPKniggelplayerFrames getSetFieldFunc "..playerId.." \""..field.."\"", self.COMchannel)
+  end
+  frame.sendVersion = function(self, playerId)
+    local msg = self.COMMsgPrefixes.sendVersionNumber
+    msg = msg..(GetAddOnMetadata("Kniggel", "Version") or "?")
+    iTP:SendAddonMessage(self.COMprefix, msg, "WHISPER", playerId)
   end
   
   --------------------
@@ -1919,6 +1928,33 @@ function iTPCallback:CHAT_MSG_ADDON(prefix, msg, channel, from, sendermsgid)
           table.insert(winPlayers, {argTable[i], argTable[i + 1]})
         end
         updateGameState()
+      end
+    elseif MSGPrefix == frame.COMMsgPrefixes.sendBroadcastGameBackup then
+      --KniggelplayerFrames getSetFieldFunc playerId "field1 ... fieldn"
+      --KniggelplayerFrames getSetDiceFunc playerId "d1 ... dn"
+      --KniggelglobalFrame getSetDiceFunc "" "d1 ... dn"
+      local argTable = mysplit2(msg:sub(4))
+      --protect against exposing "_G" table to user input
+      local protectedTables = {["_G"]=1};
+      if not protectedTables[argTable[1]] then
+        --get correct frame
+        local framesT = _G[argTable[1]]
+        if framesT then
+          --get frame's setter func
+          local framesTSetF = framesT[argTable[2]]
+          if framesTSetF then
+            --get playerId transfer func
+            local f = framesTSetF(argTable[3])
+            if f then
+              --transfer data to correct table
+              f(argTable[4])
+            end
+          end
+        end
+      end
+    elseif MSGPrefix == frame.COMMsgPrefixes.reqVersionNumber then
+      if from ~= myPlayerId then
+        frame:sendVersion(from)
       end
     end
   end
