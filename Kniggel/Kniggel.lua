@@ -91,6 +91,7 @@ local turnPlayerId = ""
 local winPlayers = nil
 local myGames = {};
 local myGameId = ""
+local scratchFieldnumber = -1
 
 local invitedBy, invitedByGameId, invitedByGameMode, invitedByChannel = "", "", "", ""
 local myPlayerId

@@ -107,7 +107,8 @@
     PREFIX is the calling addon's registered prefix (filled with
       trailing spaces to be 8 characters long).
     M_ID is the current message id. Each message that is put into the
-      output queue is assigned a consecutive id between 0000 and ffff.
+      output queue is assigned a consecutive id between 0x0000 and
+      0xffff.
     PCNT is the number of parts this message was split into.
     PNUM is the current part's number.
     PMSG is the currently transmitted part of the message.
@@ -116,6 +117,14 @@
   
   The output uses a FIFO queue.
 --]]
+
+--------------------
+--XXX BfA compat
+--------------------
+local isBfA = select(4, GetBuildInfo()) >= 80000
+local RegisterAddonMessagePrefix = isBfA and C_ChatInfo.RegisterAddonMessagePrefix or RegisterAddonMessagePrefix
+local SendAddonMessage = isBfA and C_ChatInfo.SendAddonMessage or SendAddonMessage
+--------------------
 
 local iTP = LibStub:NewLibrary("iTransferProtocol-1.0", 1)
 
@@ -191,7 +200,7 @@ end
 
 function iTP:SendAddonMessage(prefix, message, channel, whispertarget)
   prefix = getPaddedPrefix(prefix)
-  prefixTable = self.prefixes[prefix]
+  local prefixTable = self.prefixes[prefix]
   if not prefixTable then
     error(format("Prefix %s is not registered.", trim1(prefix)))
   end
@@ -242,7 +251,7 @@ end
 
 function iTP:ClearPendingMessages(prefix)
   prefix = getPaddedPrefix(prefix)
-  prefixTable = self.prefixes[prefix]
+  local prefixTable = self.prefixes[prefix]
   if not prefixTable then
     error(format("Prefix %s is not registered.", trim1(prefix)))
   end
@@ -254,7 +263,7 @@ end
 
 function iTP:RepeatLastMessage(prefix)
   prefix = getPaddedPrefix(prefix)
-  prefixTable = self.prefixes[prefix]
+  local prefixTable = self.prefixes[prefix]
   if not prefixTable then
     error(format("Prefix %s is not registered.", trim1(prefix)))
   end
@@ -348,7 +357,7 @@ function iTPFrame:CHAT_MSG_ADDON(prefix, msg, channel, from)
   
   local payloadPrefix = msg:sub(1, 8)
   
-  prefixTable = iTP.prefixes[payloadPrefix]
+  local prefixTable = iTP.prefixes[payloadPrefix]
   if not prefixTable then return end
   
   local msgid = tonumber(msg:sub(9, 12), 16)
